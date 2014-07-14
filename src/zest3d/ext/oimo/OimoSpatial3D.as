@@ -4,18 +4,18 @@ package zest3d.ext.oimo
 	import com.element.oimo.physics.collision.shape.ShapeConfig;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import plugin.math.algebra.AVector;
-	import zest3d.scenegraph.TriMesh;
+	import zest3d.scenegraph.Spatial;
 	
-	public class OimoMesh3D
+	public class OimoSpatial3D
 	{
-		public var rigidBody:RigidBody
-		public var mesh:TriMesh;
+		public var rigidBody:RigidBody;
+		public var spatial:Spatial;
 		public var shape:Shape;
 		
-		public function OimoMesh3D( shape:Shape, mesh:TriMesh, type:uint = 0x0 )
+		public function OimoSpatial3D( shape:Shape, spatial:Spatial, type:uint = 0x0 )
 		{
 			this.shape = shape;
-			this.mesh = mesh;
+			this.spatial = spatial;
 			rigidBody = new RigidBody();
 			rigidBody.addShape(shape);
 			rigidBody.setupMass(type);

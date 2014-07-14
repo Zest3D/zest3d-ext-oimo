@@ -11,33 +11,33 @@ package zest3d.ext.oimo
 	import zest3d.primitives.CubePrimitive;
 	import zest3d.primitives.CylinderPrimitive;
 	import zest3d.primitives.SpherePrimitive;
-	import zest3d.scenegraph.TriMesh;
+	import zest3d.scenegraph.Spatial;
 	
 	public class OimoWorld
 	{
-		public var world:World
-		private var _meshList:Vector.<OimoMesh3D>;
+		public var world:World;
+		protected var _spatialList:Vector.<OimoSpatial3D>;
 		
 		public function OimoWorld(stepPerSecound:Number = 30)
 		{
 			world = new World(stepPerSecound);
-			_meshList = new Vector.<OimoMesh3D>();
+			_spatialList = new Vector.<OimoSpatial3D>();
 		}
 		
-		private function addChild(oimoMesh3D:OimoMesh3D):void
+		private function addChild(oimoSpatial3D:OimoSpatial3D):void
 		{
-			_meshList.push( oimoMesh3D );
-			world.addRigidBody(oimoMesh3D.rigidBody);
+			_spatialList.push(oimoSpatial3D);
+			world.addRigidBody(oimoSpatial3D.rigidBody);
 		}
 		
 		public function step():void
 		{
 			var r:RigidBody;
-			var obj:TriMesh;
-			for each( var i:OimoMesh3D in _meshList )
+			var spatial:Spatial;
+			for each( var i:OimoSpatial3D in _spatialList )
 			{
 				r = i.rigidBody;
-				obj = i.mesh;
+				spatial = i.spatial;
 				
 				//TODO pool these objects
 				var translate:APoint = new APoint();
@@ -59,14 +59,11 @@ package zest3d.ext.oimo
 				translate.y = r.position.y;
 				translate.z = r.position.z;
 				
-				obj.localTransform.rotate = rotate;
-				obj.localTransform.translate = translate;
+				spatial.localTransform.rotate = rotate;
+				spatial.localTransform.translate = translate;
 			}
 			world.step();
 		}
-		
-		
-		
 		
 		public function addCylinder( cylinder:CylinderPrimitive, radius:Number, height:Number, rigidBodyType: uint = 0x0 ):void
 		{
@@ -76,7 +73,7 @@ package zest3d.ext.oimo
 			cylinderConfig.rotation = cylinderConfig.rotation.mulRotate( cylinderConfig.rotation, 90 * (Math.PI / 180), 1, 0, 0 ); // make the Zest3D and Oimo cylinders orientation the same.
 			
 			var cylinderShape:CylinderShape = new CylinderShape( 1, 2, cylinderConfig );
-			var cylinderMesh3D:OimoMesh3D = new OimoMesh3D( cylinderShape, cylinder );
+			var cylinderMesh3D:OimoSpatial3D = new OimoSpatial3D( cylinderShape, cylinder as Spatial, rigidBodyType );
 			cylinderMesh3D.friction = 1.5;
 			cylinderMesh3D.restitution = 0.5;
 			addChild( cylinderMesh3D );
@@ -87,7 +84,7 @@ package zest3d.ext.oimo
 			var sphereConfig:ShapeConfig = new ShapeConfig();
 			sphereConfig.position.init( sphere.x, sphere.y, sphere.z );
 			var sphereShape:SphereShape = new SphereShape( 1, sphereConfig );
-			var sphereMesh3D:OimoMesh3D = new OimoMesh3D( sphereShape, sphere );
+			var sphereMesh3D:OimoSpatial3D = new OimoSpatial3D( sphereShape, sphere as Spatial, rigidBodyType );
 			
 			sphereMesh3D.friction = 1.5;
 			sphereMesh3D.restitution = 0.5;
@@ -100,7 +97,7 @@ package zest3d.ext.oimo
 			cubeConfig.position.init( cube.x, cube.y, cube.z );
 			var boxShape:BoxShape = new BoxShape( xExtent * 2, yExtent * 2, zExtent * 2, cubeConfig );
 			
-			var boxMesh3D:OimoMesh3D = new OimoMesh3D( boxShape, cube, rigidBodyType );
+			var boxMesh3D:OimoSpatial3D = new OimoSpatial3D( boxShape, cube as Spatial, rigidBodyType );
 			boxMesh3D.friction = 1.5;
 			boxMesh3D.restitution = 0.5;
 			
